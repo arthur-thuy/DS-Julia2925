@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.37
+# v0.19.38
 
 using Markdown
 using InteractiveUtils
@@ -10,7 +10,7 @@ using PlutoUI
 # ╔═╡ 24b76a7c-63dd-11eb-1b78-d5a20557e5cd
 # edit the code below to set your name and UGent username
 
-student = (name = "Jim Janssen", email = "Jim.Janssen@UGent.be");
+student = (name = "Arthur Thuy", email = "Arthur.Thuy@UGent.be");
 
 # press the ▶ button in the bottom right of this cell to run your edits
 # or use Shift+Enter
