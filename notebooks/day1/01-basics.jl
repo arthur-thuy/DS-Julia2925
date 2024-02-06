@@ -959,17 +959,8 @@ c = $(@bind c NumberField(1:100000000))\
 n = $(@bind n NumberField(1:100000000))
 """
 
-# ╔═╡ 9ad46340-72ab-4732-b4e6-58cd6293ee25
-function checkfermat()
-	a = values[1]
-	b = values[2]
-	d = values[3]
-	d = values[4]
-	return checkfermat(a,b,c,d)
-end
-
-# ╔═╡ 09191c97-dd08-4314-8afc-e6b74a5bdaf5
-checkfermat()
+# ╔═╡ d00a3a24-a85d-4e8e-ab48-251fe22053d3
+checkfermat(a,b,c,n)
 
 # ╔═╡ f077c390-57fe-11eb-1ad9-31110b3dac39
 md"""### 9. Extra exercises"""
@@ -1541,8 +1532,7 @@ end
 # ╟─b1af96ea-5af8-11eb-0d08-f59a4c2b686c
 # ╠═bf53d86c-59e1-11eb-1456-5518e1f63390
 # ╟─da5537b5-88e7-4377-90c6-abbc7eaf6495
-# ╠═9ad46340-72ab-4732-b4e6-58cd6293ee25
-# ╠═09191c97-dd08-4314-8afc-e6b74a5bdaf5
+# ╠═d00a3a24-a85d-4e8e-ab48-251fe22053d3
 # ╟─db78af32-b822-49dd-b085-6f51ba6b623f
 # ╟─f077c390-57fe-11eb-1ad9-31110b3dac39
 # ╟─5f6b3a73-9979-4fdd-b0d0-be43419c6547

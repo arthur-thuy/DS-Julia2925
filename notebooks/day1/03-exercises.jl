@@ -467,7 +467,14 @@ hint(md"Try to increase the window size for clearer results.")
 
 # ╔═╡ c23ff59c-3ca1-11eb-1a31-2dd522b9d239
 function protein_sliding_window(sequence, m, zscales)
-	return missing
+	n = length(sequence)
+	y = zeros(n)
+	for i in (m+1):(n-m)  # what about clamping???
+		for k in -m:m
+			y[i] += zscales[sequence[i+k]]
+		end
+	end
+	return y / (2m + 1)
 end
 
 # ╔═╡ 17e7750e-49c4-11eb-2106-65d47b16308c
@@ -624,8 +631,18 @@ md"""
 function convolve_2d(M::Matrix, K::Matrix)
 	out = similar(M)
 	n_rows, n_cols = size(M)
-	#...
-	return missing
+	fill!(out, 0.0)
+	m = div(size(K, 1), 2) 
+	for i in 1:n_rows
+		for j in 1:n_cols
+			for k in -m:m
+				for l in -m:m
+					out[i,j] += M[clamp(i+k, 1, n_rows), clamp(j+l, 1, n_cols)] * K[k+m+1,l+m+1]
+				end
+			end
+		end
+	end
+	return out
 end
 
 # ╔═╡ 7d4c40d6-2aa3-4246-8554-bef080109f19
@@ -644,7 +661,9 @@ md"""
 
 # ╔═╡ f5574a90-5a90-11eb-3100-dd98e3375390
 function gaussian_kernel(m; σ=4)
-	return missing
+  	K = [exp(-(i^2 + j^2) / 2σ^2) for i in -m:m, j in -m:m]
+  	K ./= sum(K)
+  	return K
 end
 
 # ╔═╡ 2286d0a6-1413-4b30-8436-712e0ddf6767
@@ -699,7 +718,10 @@ You can easily convert an argument of a function by piping it into a type:
 
 # ╔═╡ ca0748ee-5e2e-11eb-0199-45a98c0645f2
 function convolve_image(M::Matrix{<:AbstractRGB}, K::Matrix)
-	return missing
+	Mred = convolve_2d(red.(M) .|> Float32, K)
+	Mgreen = convolve_2d(green.(M) .|> Float32, K)
+	Mblue = convolve_2d(blue.(M) .|> Float32, K)
+	return RGB.(Mred, Mgreen, Mblue)
 end
 
 # ╔═╡ 1e97c530-5a8f-11eb-14b0-47e7e944cba1

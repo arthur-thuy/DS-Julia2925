@@ -717,23 +717,6 @@ rook_problem(R1)
 rook_problem(R2)
 
 
-# ╔═╡ c1e377c4-64a4-11eb-3e7f-b163cb465057
-md"""
-> **Question 2: Computing the determinant**
-
-1. Write a function `mydet` to compute the determinant of a 2x2 square matrix. Remember, for a $2 \times 2$ matrix, the determinant is computed as
-
-${\displaystyle|A|={\begin{vmatrix}a&b\\c&d\end{vmatrix}}=ad-bc.}$
-
-2. For larger matrices, there is a recursive way of computing the determinant based on the minors, i.e. the determinants of the submatrices. See [http://mathworld.wolfram.com/Determinant.html](http://mathworld.wolfram.com/Determinant.html). Update `mydet` to compute the determinant of a general square matrix.
-"""
-
-# ╔═╡ 5619fd6c-4cfe-11eb-1512-e1800b6c7df9
-function mydet(A)
-	size(A,1) != size(A,2) && throw(DimensionMismatch)
-	return missing
-end
-
 # ╔═╡ e5293248-64a4-11eb-0d30-53a15bec0d01
 md"""
 > **Question 3: it is pi 'o clock**
@@ -767,46 +750,6 @@ estimatepi(10000)
 # ╔═╡ 41b19e20-4d0f-11eb-1c3c-572cc5243d99
 
 
-# ╔═╡ 04aff640-58bb-11eb-1bb6-69ad9fc32314
-md"## 5. Extra exercises"
-
-# ╔═╡ 5c8f024f-87a3-444f-8f09-5d179a04a1cb
-md"""
-> **Question 4: Markdown tables**
-
-Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents. It is also the markup language used in this notebook. Markdown is really easy to learn (see the example below). The problem with markdown is that table generation is a tedious process... Write a small Julia package (read function) that generates a markdown table that takes an array of strings for the header and an n-by-m array of table values. Complete `markdowntable()` below. The function should both return a string of the markdown table and should automatically copies this to the clipboard using the `clipboard()` function. Just for completion, you should end your table with a newline (\n).
-
-```
-# Header 1
-## Header 2
-### Header 3
-
-**This text is bold** and *this is italic*.
-
-* This
-* is 
-* a 
-* list.
-
-| This | is | a | table |
-| :--|:--|:--|:--| 
-| 5 | 10 | 10 | 3 |
-| 9 | 3 | 1 | 5 |
-| 8 | 4 | 7 | 6 |
-	
------------------
-```
-
-Hints:
-- The `join` and `repeat`-functions might come in handy;
-- The `@assert` macro should get you close to solving the second part.
-"""
-
-# ╔═╡ 75d14674-58ba-11eb-3868-172fc00a0eb8
-function markdowntable(table, header)
-	missing
-end
-
 # ╔═╡ 1c726f9d-d60e-4707-b548-0abac5ddcc5e
 md"""
 > **Question 4: Check password**
@@ -822,30 +765,16 @@ Your function returns `true` if the password matches the requirements and a `fal
 
 """
 
-# ╔═╡ 7c3bd872-08bb-41bd-b101-da2fe995a013
+# ╔═╡ 4f551202-1923-4c13-b7f8-1a6aea37667c
 function check_password(pwd)
-	@assert length(pwd) >= 6
-	num_letters = 0
-	num_lowercase = 0
-	num_uppercase = 0
-	num_numbers = 0
-	num_specials = 0
-	for letter in pwd
-		isletter(letter) ? num_letters += 1
-	return missing
-end
-
-# ╔═╡ 9922072b-398f-46b1-bbd6-1d49fe1dad60
-# # isletter('t')
-# isletter('t') ? println("test") :;
-
-# ╔═╡ 17780164-20c0-4618-b84d-d992cbd1c0f2
-
-
-# ╔═╡ 9416aafc-3102-49a0-bed6-4850b8133ae5
-for letter in "test"
-	println(letter)
-end
+		l = length(pwd)
+		letters = count(isletter, pwd)
+		upper = count(isuppercase, pwd) 
+		lower = count(islowercase, pwd)
+		nums = count(isnumeric, pwd)
+		nonconv = length(pwd ∩ "!@#\$%^&*()_+-=,.?") # NOTE: intersection
+		return l ≥ 6 && letters ≥ 2 && upper ≥ 1 && lower ≥ 1 && nums ≥ 1 && nonconv ≥ 1
+	end
 
 # ╔═╡ 85a48b0a-2967-4016-8035-aae6467c3012
 check_password("password")
@@ -940,18 +869,6 @@ if answ_q1 == true
 	function riemannsum(f, a, b; n=100)
 	  dx = (b - a) / n
 	  return sum(f.(a:dx:b)) * dx
-	end
-	```
-	"""
-end
-
-# ╔═╡ eae5611f-913c-48e4-bc1b-86d33908ac46
-if answ_q2 == true
-	md"""
-	```Julia
-	function mydet(A)
-		size(A,1) != size(A,2) && throw(DimensionMismatch)
-		return A[1,1]*A[2,2]-[1,2]*A[2,1]
 	end
 	```
 	"""
@@ -1211,23 +1128,14 @@ md""" ## 5. References
 # ╠═b9b32e46-1645-4c9b-8a6d-e624ce0421b6
 # ╠═5903e50f-f2d8-4c61-b62c-9d55a900b558
 # ╠═79bb03b0-ad2e-40dd-8e79-73725910fbe7
-# ╠═c1e377c4-64a4-11eb-3e7f-b163cb465057
-# ╠═5619fd6c-4cfe-11eb-1512-e1800b6c7df9
-# ╟─eae5611f-913c-48e4-bc1b-86d33908ac46
 # ╟─e5293248-64a4-11eb-0d30-53a15bec0d01
 # ╠═027b9824-2cb7-4dc8-8e18-9c31cbb625a2
 # ╠═cb20fffe-58cf-11eb-1b65-49699f2d3699
 # ╠═fe3f4676-1f93-4bda-9fd2-0809b0cbf74c
 # ╟─be4c9bbe-0ec1-4477-b422-dcf308cd6f5b
 # ╟─41b19e20-4d0f-11eb-1c3c-572cc5243d99
-# ╟─04aff640-58bb-11eb-1bb6-69ad9fc32314
-# ╟─5c8f024f-87a3-444f-8f09-5d179a04a1cb
-# ╠═75d14674-58ba-11eb-3868-172fc00a0eb8
-# ╠═1c726f9d-d60e-4707-b548-0abac5ddcc5e
-# ╠═7c3bd872-08bb-41bd-b101-da2fe995a013
-# ╠═9922072b-398f-46b1-bbd6-1d49fe1dad60
-# ╠═17780164-20c0-4618-b84d-d992cbd1c0f2
-# ╠═9416aafc-3102-49a0-bed6-4850b8133ae5
+# ╟─1c726f9d-d60e-4707-b548-0abac5ddcc5e
+# ╠═4f551202-1923-4c13-b7f8-1a6aea37667c
 # ╠═85a48b0a-2967-4016-8035-aae6467c3012
 # ╠═8541115f-6bcd-4015-9a5f-9430edc4ad3a
 # ╟─cf2b6aa4-b0e8-471a-95fc-646bbddb989a
