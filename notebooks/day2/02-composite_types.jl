@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.37
+# v0.19.38
 
 using Markdown
 using InteractiveUtils
@@ -14,13 +14,16 @@ macro bind(def, element)
     end
 end
 
+# ╔═╡ cf2e360f-bf32-42bf-abe9-349bf103978e
+import Pkg; Pkg.add("PlutoUI")
+
 # ╔═╡ 8062c45e-1df3-44bc-981d-cc990fbe6bcb
 using PlutoUI; TableOfContents()
 
 # ╔═╡ 372d3cf2-6173-11eb-356e-23c959c3fd89
 # edit the code below to set your name and UGent username
 
-student = (name = "Sam Janssen", email = "Sam.Janssen@UGent.be");
+student = (name = "Arthur Thuy", email = "Arthur.Thuy@UGent.be");
 
 # press the ▶ button in the bottom right of this cell to run your edits
 # or use Shift+Enter
@@ -34,7 +37,7 @@ abstract type Agent end
 # ╔═╡ b96a33b8-5d8c-11eb-01de-439f53cdc355
 mutable struct Prey <: Agent
     id::Int
-    pos
+    pos  # FIXME: why no type?
 end
 
 # ╔═╡ cd0d8636-5d8c-11eb-19f9-4da4550d306f
@@ -91,7 +94,7 @@ fauna = [fly, wolf, deer]
 rand(fauna)
 
 # ╔═╡ 340538c8-654b-11eb-3733-272fb9a8f106
-#... interact
+interact(wolf, deer)
 
 # ╔═╡ b1525c16-654b-11eb-0428-43008354b402
 
@@ -103,7 +106,7 @@ begin
 		y::T
 	end
 	
-# PASTE YOUR CONSTRUCTORS HERE!
+	# TODO
 end
 
 # ╔═╡ d84355d4-5d8d-11eb-2c2c-21daf0364c21
@@ -152,12 +155,6 @@ end
 # ╔═╡ e3759d4c-5d90-11eb-0bea-bb4247623ec2
 25 ∈ Squares(10)
 
-# ╔═╡ 07998440-5d91-11eb-1a65-8de428eac89c
-sum(Squares(18093))
-
-# ╔═╡ e11b0b10-6621-11eb-0bdb-f3719cc92a20
-@elapsed sum(Squares(18093))
-
 # ╔═╡ 192d9fd4-5d91-11eb-1cb9-c706aad03480
 Base.eltype(::Type{Squares}) = Int
 
@@ -166,15 +163,6 @@ Base.length(S::Squares) = S.count
 
 # ╔═╡ 2270e790-5d91-11eb-20e5-29905f232734
 collect(Squares(4))
-
-# ╔═╡ 49f1d98c-5d91-11eb-1657-f320e9fcdc0e
-#Base.sum(S::Squares) = (n = S.count; return n*(n+1)*(2n+1)÷6)
-
-# ╔═╡ 4cb68744-5d91-11eb-2b3e-e7df55888c93
-sum(Squares(18093))  # much faster now!
-
-# ╔═╡ e99af5c0-6621-11eb-058b-45c3719930d0
-@elapsed sum(Squares(18093))
 
 # ╔═╡ e9a99a00-5d91-11eb-2c50-8be452cab83f
 struct Strang <: AbstractMatrix{Int}
@@ -190,14 +178,119 @@ Base.getindex(S::Strang, i, j) = i==j ? 2 : (abs(i - j) == 1 ?  -1 : 0)
 # ╔═╡ f3c3114c-5d91-11eb-1d37-6d97ea6d267f
 S = Strang(1000)  # holy cow! Looks just like a real matrix!
 
+# ╔═╡ 0f878dea-5d92-11eb-0000-b7484532ee70
+Base.sum(S::Strang) = 2
+
+# ╔═╡ 1e65cb9c-5d92-11eb-3526-332169917fd9
+v = randn(1000)
+
+# ╔═╡ 3ae60e88-5d94-11eb-0c50-1d74ea104758
+struct WizCur
+	galleons::Int
+	sickles::Int
+	knuts::Int
+
+	function WizCur(galleons, sickles, knuts)
+		knuts_keep = knuts % 29
+		knuts_up = div(knuts, 29)
+		sickles_total = (knuts - knuts_keep)/29 + sickles
+		sickles_keep = sickles_total % 17
+		sickles_up = div(sickles_total, 17)
+		galleons_total = sickles_up + galleons
+		new(galleons_total, sickles_keep, knuts_keep)
+	end
+end
+
+# ╔═╡ 48301af2-5d94-11eb-0019-7737667c9cea
+galleons(money::WizCur) = money.galleons
+
+# ╔═╡ 4ea80eda-5d94-11eb-3882-21a41d2d65f8
+sickles(money::WizCur) = money.sickles
+
+# ╔═╡ 5af60d90-5d94-11eb-2ee4-b7bfc2caf53b
+knuts(money::WizCur) = money.knuts
+
+# ╔═╡ 5f7c75ac-5d94-11eb-137a-7914cd009821
+
+function Base.show(io::IO, money::WizCur)
+	print(io, "$(money.galleons)G, $(money.sickles)S, $(money.knuts)K")
+end
+
+
+# ╔═╡ 95146d46-5d94-11eb-22aa-c1a544e0d784
+Base.:+(m1::WizCur, m2::WizCur) = WizCur(galleons(m1)+galleons(m2),
+										  sickles(m1)+sickles(m2),
+										  knuts(m1)+knuts(m2))
+
+# ╔═╡ 605779e6-5d8e-11eb-3e08-c7420ef76aba
+norm(p::Point{T} where {T<:Number}) = sqrt(p.x^2 + p.y^2)
+
+# ╔═╡ 6646eb5c-5d8e-11eb-1e01-f3011c4230de
+norm(p)
+
+# ╔═╡ 6960f8d2-5d8e-11eb-0215-2de7b54e3081
+norm(p_int)  # dispatch creates a method for this type
+
+# ╔═╡ 9eab40be-5d94-11eb-0c59-21f5824fb812
+money_ron = WizCur(0, 19, 732) # should be 
+
+# ╔═╡ a137e0f8-5d94-11eb-2209-73acad549307
+money_harry = WizCur(3, 1, 7)
+
+# ╔═╡ a79ba114-5d94-11eb-16ae-9906c6cdf54f
+dungbomb_fund = money_ron + money_harry
+
+# ╔═╡ d448a2e0-5d92-11eb-18a6-9ff817992154
+begin
+	struct Vandermonde{T,VT} <: AbstractMatrix{T}
+		α::VT # what is VT?
+		m::Int
+		Vandermonde(α::AbstractVector{T}, m) where {T} = new{T,typeof(α)}(α,m)
+	end
+	# take length of α as a default value of m
+	Vandermonde(α::Vector{<:Number}) = Vandermonde(α, length(α))
+end
+
+# ╔═╡ bd91a60e-5d93-11eb-09d4-830ca69439bf
+Base.size(V::Vandermonde) = (length(V.α), V.m)
+
+# ╔═╡ 39d6d5c4-5d8d-11eb-0e07-11d891ff87a3
+size(wolf)
+
+# ╔═╡ 276e9af4-5d92-11eb-1399-993570859698
+function Base.:*(S::Strang, v::Vector)
+    n = length(v)
+    @assert size(S, 2) == n
+    x = similar(v)
+	
+    for i in 1:n
+        x[i] = v[i]
+        i > 1 && (x[i] += v[i-1])
+        i < n && (x[i] += v[i+1])
+    end
+    return x
+end
+
+# ╔═╡ 49f1d98c-5d91-11eb-1657-f320e9fcdc0e
+Base.sum(S::Squares) = (n = S.count; return n*(n+1)*(2n+1)÷6)
+
+# ╔═╡ 07998440-5d91-11eb-1a65-8de428eac89c
+sum(Squares(18093))
+
+# ╔═╡ e11b0b10-6621-11eb-0bdb-f3719cc92a20
+@elapsed sum(Squares(18093))
+
+# ╔═╡ 4cb68744-5d91-11eb-2b3e-e7df55888c93
+sum(Squares(18093))  # much faster now!
+
+# ╔═╡ e99af5c0-6621-11eb-058b-45c3719930d0
+@elapsed sum(Squares(18093))
+
 # ╔═╡ 04dcda58-5d92-11eb-10ba-396947081338
 sum(S)  # works, but slow...
 
 # ╔═╡ fbdb2958-6621-11eb-3cb6-a9bdeea3bdb7
 @elapsed sum(S)
-
-# ╔═╡ 0f878dea-5d92-11eb-0000-b7484532ee70
-#Base.sum(S::Strang) = 2
 
 # ╔═╡ 11630c02-5d92-11eb-1746-4dabf327fbbe
 sum(S)
@@ -205,32 +298,17 @@ sum(S)
 # ╔═╡ 046ce4f8-6622-11eb-3c4f-7b6bf21fb77b
 @elapsed sum(S)
 
-# ╔═╡ 1e65cb9c-5d92-11eb-3526-332169917fd9
-v = randn(1000)
+# ╔═╡ 201f59ee-5d92-11eb-33ae-51904d249dd4
+S * v  # works, but slow
 
-# ╔═╡ 3ae60e88-5d94-11eb-0c50-1d74ea104758
-struct WizCur
-	missing # complete me!
-end
+# ╔═╡ 300a8428-5d92-11eb-188b-05d00df4f6a7
+S * v  # fast (linear time in v)
 
-# ╔═╡ 48301af2-5d94-11eb-0019-7737667c9cea
-galleons(money::WizCur) = missing
-
-# ╔═╡ 4ea80eda-5d94-11eb-3882-21a41d2d65f8
-sickles(money::WizCur) = missing
-
-# ╔═╡ 5af60d90-5d94-11eb-2ee4-b7bfc2caf53b
-knuts(money::WizCur) = missing
-
-# ╔═╡ 5f7c75ac-5d94-11eb-137a-7914cd009821
-#=
-function Base.show(io::IO, money::WizCur)
-    print(io, "I am printed for WIZCUR, make me say something meaningful")
-end
-=#
+# ╔═╡ e47ec839-28c6-4973-8f3e-de7e060ad89a
+value_in_knuts(money::WizCur) = 29*17galleons(money) + 29*sickles(money) + knuts(money)
 
 # ╔═╡ 678ca64a-5d94-11eb-2b85-0b706526e35b
-Base.isless(m1::WizCur, m2::WizCur) = missing
+Base.isless(m1::WizCur, m2::WizCur) = value_in_knuts(m1) < value_in_knuts(m2)
 
 # ╔═╡ 27fcaede-5d90-11eb-1cea-91fcc4b6b0fe
 struct OrderedPair
@@ -251,75 +329,17 @@ OrderedPair(18, 23)
 # ╔═╡ 2c937298-5d90-11eb-06e6-ab70b9d3701e
 OrderedPair(8, 2)
 
-# ╔═╡ 8afbd434-5d94-11eb-366b-d3d719189ef7
-Base.isgreater(m1::WizCur, m2::WizCur) = missing
-
-# ╔═╡ 9226b2d8-5d94-11eb-2bea-491eb7dc1da7
-Base.isequal(m1::WizCur, m2::WizCur) = missing
-
-# ╔═╡ 95146d46-5d94-11eb-22aa-c1a544e0d784
-Base.:+(m1::WizCur, m2::WizCur) = missing
-
-# ╔═╡ 605779e6-5d8e-11eb-3e08-c7420ef76aba
-norm(p::Point{T} where {T<:Number}) = sqrt(p.x^2 + p.y^2)
-
-# ╔═╡ 6646eb5c-5d8e-11eb-1e01-f3011c4230de
-norm(p)
-
-# ╔═╡ 6960f8d2-5d8e-11eb-0215-2de7b54e3081
-norm(p_int)  # dispatch creates a method for this type
-
-# ╔═╡ 9eab40be-5d94-11eb-0c59-21f5824fb812
-money_ron = missing
-
-# ╔═╡ a137e0f8-5d94-11eb-2209-73acad549307
-money_harry = missing
-
-# ╔═╡ a79ba114-5d94-11eb-16ae-9906c6cdf54f
-dungbomb_fund = money_ron + money_harry
-
-# ╔═╡ d448a2e0-5d92-11eb-18a6-9ff817992154
-begin
-	struct Vandermonde{T,VT} <: AbstractMatrix{T}
-		α::VT
-		m::Int
-		Vandermonde(α::AbstractVector{T}, m) where {T} = missing
-	end
-
-	# take length of α as a default value of m
-	Vandermonde(α::Vector{<:Number}) = missing
-end
-
-# ╔═╡ bd91a60e-5d93-11eb-09d4-830ca69439bf
-Base.size(V::Vandermonde) = missing
-
-# ╔═╡ 39d6d5c4-5d8d-11eb-0e07-11d891ff87a3
-size(wolf)
-
-# ╔═╡ 276e9af4-5d92-11eb-1399-993570859698
-function Base.:*(S::Strang, v::Vector)
-    n = length(v)
-    @assert size(S, 2) == n
-    x = similar(v)
-    for i in 1:n
-        x[i] = v[i]
-        i > 1 && (x[i] += v[i-1])
-        i < n && (x[i] += v[i+1])
-    end
-    return x
-end
-
 # ╔═╡ a9502b64-5d90-11eb-144c-3d7ce0949e67
 Base.iterate(S::Squares, state=1) = state > S.count ? nothing : (state*state, state+1)
 
-# ╔═╡ 201f59ee-5d92-11eb-33ae-51904d249dd4
-S * v  # works, but slow
+# ╔═╡ 8afbd434-5d94-11eb-366b-d3d719189ef7
+Base.isgreater(m1::WizCur, m2::WizCur) = value_in_knuts(m1) > value_in_knuts(m2)
 
-# ╔═╡ 300a8428-5d92-11eb-188b-05d00df4f6a7
-S * v  # fast (linear time in v)
+# ╔═╡ 9226b2d8-5d94-11eb-2bea-491eb7dc1da7
+Base.isequal(m1::WizCur, m2::WizCur) = value_in_knuts(m1) == value_in_knuts(m2)
 
 # ╔═╡ c2ecfec8-5d93-11eb-2640-07bc07f3da98
-Base.getindex(V::Vandermonde, i, j) = missing
+Base.getindex(V::Vandermonde, i, j) = V.α[i]^(j-1)
 
 # ╔═╡ eb0428ac-5d8c-11eb-09a3-2b3cfc77f3f4
 begin
@@ -566,7 +586,7 @@ Hint: `prod`
 import LinearAlgebra
 
 # ╔═╡ dc945902-5d93-11eb-1121-a7ae99c5862e
-LinearAlgebra.det(V::Vandermonde) = missing
+LinearAlgebra.det(V::Vandermonde) = ((xi-xj) for (i,xi) in enumerate(V.α), (j, xj) in enumerate(V.α) if i < j) |> prod
 
 # ╔═╡ 0267b920-9a1f-472f-9d21-5609fb877325
 md"""## Answers:
@@ -651,281 +671,8 @@ if answ_q3 == true
 	"""
 end
 
-# ╔═╡ 00000000-0000-0000-0000-000000000001
-PLUTO_PROJECT_TOML_CONTENTS = """
-[deps]
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-
-[compat]
-PlutoUI = "~0.7.49"
-"""
-
-# ╔═╡ 00000000-0000-0000-0000-000000000002
-PLUTO_MANIFEST_TOML_CONTENTS = """
-# This file is machine-generated - editing it directly is not advised
-
-[[AbstractPlutoDingetjes]]
-deps = ["Pkg"]
-git-tree-sha1 = "8eaf9f1b4921132a4cff3f36a1d9ba923b14a481"
-uuid = "6e696c72-6542-2067-7265-42206c756150"
-version = "1.1.4"
-
-[[ArgTools]]
-uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
-
-[[Artifacts]]
-uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
-
-[[Base64]]
-uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
-
-[[ColorTypes]]
-deps = ["FixedPointNumbers", "Random"]
-git-tree-sha1 = "eb7f0f8307f71fac7c606984ea5fb2817275d6e4"
-uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-version = "0.11.4"
-
-[[CompilerSupportLibraries_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.0.5+1"
-
-[[Dates]]
-deps = ["Printf"]
-uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
-
-[[Downloads]]
-deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
-uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.6.0"
-
-[[FileWatching]]
-uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
-
-[[FixedPointNumbers]]
-deps = ["Statistics"]
-git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
-uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
-version = "0.8.4"
-
-[[Hyperscript]]
-deps = ["Test"]
-git-tree-sha1 = "8d511d5b81240fc8e6802386302675bdf47737b9"
-uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
-version = "0.0.4"
-
-[[HypertextLiteral]]
-deps = ["Tricks"]
-git-tree-sha1 = "c47c5fa4c5308f27ccaac35504858d8914e102f9"
-uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.4"
-
-[[IOCapture]]
-deps = ["Logging", "Random"]
-git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
-uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.2"
-
-[[InteractiveUtils]]
-deps = ["Markdown"]
-uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
-
-[[JSON]]
-deps = ["Dates", "Mmap", "Parsers", "Unicode"]
-git-tree-sha1 = "3c837543ddb02250ef42f4738347454f95079d4e"
-uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.21.3"
-
-[[LibCURL]]
-deps = ["LibCURL_jll", "MozillaCACerts_jll"]
-uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
-version = "0.6.4"
-
-[[LibCURL_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
-uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.4.0+0"
-
-[[LibGit2]]
-deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
-uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
-
-[[LibGit2_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
-uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.6.4+0"
-
-[[LibSSH2_jll]]
-deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
-uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.11.0+1"
-
-[[Libdl]]
-uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
-
-[[LinearAlgebra]]
-deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
-uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-
-[[Logging]]
-uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[MIMEs]]
-git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
-uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
-version = "0.1.4"
-
-[[Markdown]]
-deps = ["Base64"]
-uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
-
-[[MbedTLS_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.2+1"
-
-[[Mmap]]
-uuid = "a63ad114-7e13-5084-954f-fe012c677804"
-
-[[MozillaCACerts_jll]]
-uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.1.10"
-
-[[NetworkOptions]]
-uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
-version = "1.2.0"
-
-[[OpenBLAS_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
-uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+2"
-
-[[Parsers]]
-deps = ["Dates", "SnoopPrecompile"]
-git-tree-sha1 = "8175fc2b118a3755113c8e68084dc1a9e63c61ee"
-uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.5.3"
-
-[[Pkg]]
-deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
-uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.10.0"
-
-[[PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eadad7b14cf046de6eb41f13c9275e5aa2711ab6"
-uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.49"
-
-[[Preferences]]
-deps = ["TOML"]
-git-tree-sha1 = "47e5f437cc0e7ef2ce8406ce1e7e24d44915f88d"
-uuid = "21216c6a-2e73-6563-6e65-726566657250"
-version = "1.3.0"
-
-[[Printf]]
-deps = ["Unicode"]
-uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-
-[[REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
-uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
-
-[[Random]]
-deps = ["SHA"]
-uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-
-[[Reexport]]
-git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
-uuid = "189a3867-3050-52da-a836-e630ba90ab69"
-version = "1.2.2"
-
-[[SHA]]
-uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
-version = "0.7.0"
-
-[[Serialization]]
-uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-
-[[SnoopPrecompile]]
-deps = ["Preferences"]
-git-tree-sha1 = "e760a70afdcd461cf01a575947738d359234665c"
-uuid = "66db9d55-30c0-4569-8b51-7e840670fc0c"
-version = "1.0.3"
-
-[[Sockets]]
-uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
-
-[[SparseArrays]]
-deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
-uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.10.0"
-
-[[Statistics]]
-deps = ["LinearAlgebra", "SparseArrays"]
-uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.10.0"
-
-[[SuiteSparse_jll]]
-deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
-uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.2.1+1"
-
-[[TOML]]
-deps = ["Dates"]
-uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
-version = "1.0.3"
-
-[[Tar]]
-deps = ["ArgTools", "SHA"]
-uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
-version = "1.10.0"
-
-[[Test]]
-deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
-uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[[Tricks]]
-git-tree-sha1 = "6bac775f2d42a611cdfcd1fb217ee719630c4175"
-uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.6"
-
-[[URIs]]
-git-tree-sha1 = "ac00576f90d8a259f2c9d823e91d1de3fd44d348"
-uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
-version = "1.4.1"
-
-[[UUIDs]]
-deps = ["Random", "SHA"]
-uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
-
-[[Unicode]]
-uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-
-[[Zlib_jll]]
-deps = ["Libdl"]
-uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.13+1"
-
-[[libblastrampoline_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.8.0+1"
-
-[[nghttp2_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.52.0+1"
-
-[[p7zip_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.4.0+2"
-"""
-
 # ╔═╡ Cell order:
+# ╠═cf2e360f-bf32-42bf-abe9-349bf103978e
 # ╠═372d3cf2-6173-11eb-356e-23c959c3fd89
 # ╟─8062c45e-1df3-44bc-981d-cc990fbe6bcb
 # ╟─eb0428ac-5d8c-11eb-09a3-2b3cfc77f3f4
@@ -941,8 +688,8 @@ version = "17.4.0+2"
 # ╟─dac11770-5d8c-11eb-1058-2d043e172931
 # ╠═61c43794-6174-11eb-1545-2db114b929e4
 # ╟─e7b9023a-5d8c-11eb-1387-cfa7c41ab6ca
-# ╟─fb6e62d4-5d8c-11eb-34f3-bf3df7cd4cb3
 # ╠═01fe6f9a-5d8d-11eb-0519-03aefcd587bb
+# ╟─fb6e62d4-5d8c-11eb-34f3-bf3df7cd4cb3
 # ╠═05ae1a2a-5d8d-11eb-0ed8-496f48194232
 # ╟─18d04a36-5d8d-11eb-1986-693eaad5d5be
 # ╠═1df0419c-5d8d-11eb-3444-d5741bf10d32
@@ -1033,6 +780,7 @@ version = "17.4.0+2"
 # ╠═4ea80eda-5d94-11eb-3882-21a41d2d65f8
 # ╠═5af60d90-5d94-11eb-2ee4-b7bfc2caf53b
 # ╠═5f7c75ac-5d94-11eb-137a-7914cd009821
+# ╠═e47ec839-28c6-4973-8f3e-de7e060ad89a
 # ╠═678ca64a-5d94-11eb-2b85-0b706526e35b
 # ╠═8afbd434-5d94-11eb-366b-d3d719189ef7
 # ╠═9226b2d8-5d94-11eb-2bea-491eb7dc1da7
@@ -1054,5 +802,3 @@ version = "17.4.0+2"
 # ╠═dc945902-5d93-11eb-1121-a7ae99c5862e
 # ╟─1c373bba-eeb6-4673-8b18-0d68b524e536
 # ╠═0267b920-9a1f-472f-9d21-5609fb877325
-# ╟─00000000-0000-0000-0000-000000000001
-# ╟─00000000-0000-0000-0000-000000000002
